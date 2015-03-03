@@ -106,7 +106,7 @@ switch(@$task)
 					unset($_SESSION['lockout']);
 				}
 				###
-				if (!empty($return))
+				if (!empty($return) && parse_url($_SERVER['HTTP_HOST'], PHP_URL_HOST) == parse_url($return, PHP_URL_HOST))
 				{
 					header( "Location: ".urldecode($return)); //Redirection to the protected resource
 					die();
