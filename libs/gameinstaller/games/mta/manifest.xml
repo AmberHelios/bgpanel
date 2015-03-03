@@ -27,12 +27,12 @@ NOTE: Resource files are not downloaded !
 
 			<!-- Move all files from extracted folders to dest -->
 			<move>multitheftauto_linux-1.4.1/*, .</move>
-			<move>baseconfig-1.4.1/*, mods/deathmatch</move>
+			<move>baseconfig/*, mods/deathmatch</move>
 			<!-- Delete Downloaded Archives -->
 			<delete>multitheftauto_linux-1.4.1.tar.gz</delete>
 			<delete>baseconfig-1.4.1.tar.gz</delete>
 			<delete>multitheftauto_linux-1.4.1</delete>
-			<delete>baseconfig-1.4.1</delete>
+			<delete>baseconfig</delete>
 		</repository>
 
 		<!-- Install Game Server From Game Repository -->
