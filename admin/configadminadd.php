@@ -22,7 +22,7 @@
  * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
  * @copyleft	2013
  * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 8
+ * @version		(Release 0) DEVELOPER BETA 9
  * @link		http://www.bgpanel.net/
  */
 
@@ -104,13 +104,6 @@ if (!empty($_SESSION['access']) && $_SESSION['access'] == 'Full')
 	unset($_SESSION['access']);
 }
 ?>><?php echo T_('Full Administrator'); ?></option>
-							<option value="Limited" <?php
-if (!empty($_SESSION['access']) && $_SESSION['access'] == 'Limited')
-{
-	echo " selected=\"selected\"";
-	unset($_SESSION['access']);
-}
-?>><?php echo T_('Limited Administrator'); ?></option>
 						</select>
 					<div style="text-align: center; margin-top: 19px;">
 						<button type="submit" class="btn btn-primary"><?php echo T_('Add New Administrator'); ?></button>

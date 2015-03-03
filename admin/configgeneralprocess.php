@@ -22,7 +22,7 @@
  * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
  * @copyleft	2013
  * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 8
+ * @version		(Release 0) DEVELOPER BETA 9
  * @link		http://www.bgpanel.net/
  */
 
@@ -76,7 +76,7 @@ switch (@$task)
 		//---------------------------------------------------------+
 		$err = 0;
 
-		foreach ($templates as $key => $value)
+		foreach ($global_templates as $key => $value)
 		{
 			if ($adminTemplate == $value)
 			{
@@ -96,7 +96,7 @@ switch (@$task)
 		//---------------------------------------------------------+
 		$err = 0;
 
-		foreach ($templates as $key => $value)
+		foreach ($global_templates as $key => $value)
 		{
 			if ($clientTemplate == $value)
 			{

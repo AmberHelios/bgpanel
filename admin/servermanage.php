@@ -22,7 +22,7 @@
  * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
  * @copyleft	2013
  * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 8
+ * @version		(Release 0) DEVELOPER BETA 9
  * @link		http://www.bgpanel.net/
  */
 
@@ -31,16 +31,13 @@
 $page = 'servermanage';
 $tab = 2;
 $isSummary = TRUE;
-###
-if (isset($_GET['id']) && is_numeric($_GET['id']))
-{
-	$serverid = $_GET['id'];
-}
-else
+
+if ( !isset($_GET['id']) || !is_numeric($_GET['id']) )
 {
 	exit('Error: ServerID error.');
 }
-###
+
+$serverid = $_GET['id'];
 $return = 'servermanage.php?id='.urlencode($serverid);
 
 
@@ -52,6 +49,8 @@ require_once("../libs/gameinstaller/gameinstaller.php");
 
 
 $title = T_('Server Control Panel');
+
+$serverid = mysql_real_escape_string($_GET['id']);
 
 
 if (query_numrows( "SELECT `name` FROM `".DBPREFIX."server` WHERE `serverid` = '".$serverid."'" ) == 0)
@@ -118,6 +117,7 @@ if ($rows['panelstatus'] == 'Started')
 
 ?>
 
+				<li><a href="#" onclick="ajxp()"><?php echo T_('WebFTP'); ?></a></li>
 				<li><a href="serverlog.php?id=<?php echo $serverid; ?>"><?php echo T_('Activity Logs'); ?></a></li>
 			</ul>
 <?php
@@ -309,7 +309,7 @@ else if ($rows['status'] == 'Active')
 ?>
 				</p>
 			</div>
-			<script type="text/javascript">
+			<script>
 			function dlScrLog()
 			{
 				if (confirm("<?php echo T_('Download SCREENLOG ?'); ?>"))
@@ -325,13 +325,18 @@ else if ($rows['status'] == 'Active')
 }
 
 ?>
-			<script type="text/javascript">
+			<script>
 			function doGameServerAction(serverid, task, action, game)
 			{
 				if (confirm('Are you sure you want to '+action+' ('+game+') ?'))
 				{
 					window.location='serverprocess.php?serverid='+serverid+'&task='+task;
 				}
+			}
+			<!-- -->
+			function ajxp()
+			{
+				window.open('utilitieswebftp.php?go=true', 'AjaXplorer - files', config='width='+screen.width/1.5+', height='+screen.height/1.5+', fullscreen=yes, toolbar=no, location=no, directories=no, status=yes, menubar=no, scrollbars=yes, resizable=yes');
 			}
 			</script>
 <?php

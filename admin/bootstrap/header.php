@@ -22,7 +22,7 @@
  * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
  * @copyleft	2013
  * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 8
+ * @version		(Release 0) DEVELOPER BETA 9
  * @link		http://www.bgpanel.net/
  */
 
@@ -69,6 +69,7 @@ if (($page == 'scriptconsole') || ($page == 'utilitiesrcontool'))
 ?>
 			<script src="../bootstrap/js/jquery.lazyload.min.js"></script>
 			<script src="../bootstrap/js/bootstrap.js"></script>
+			<script src="../bootstrap/js/go-to-top.js"></script>
 		<!-- Style -->
 			<!-- Boostrap -->
 			<link href="../bootstrap/css/<?php echo TEMPLATE; ?>" rel="stylesheet">
@@ -84,8 +85,14 @@ if (($page == 'scriptconsole') || ($page == 'utilitiesrcontool'))
 				padding-top: 60px;
 				padding-bottom: 40px;
 			}
+			@media (max-width: 1023px) {
+				.nav-collapse {
+					overflow-y: auto;
+				}
+			}
 			</style>
 			<link href="../bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+			<link href="../bootstrap/css/go-to-top.css" rel="stylesheet">
 		<!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
 			<!--[if lt IE 9]>
 			  <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -95,7 +102,7 @@ if (($page == 'scriptconsole') || ($page == 'utilitiesrcontool'))
 	</head>
 
 
-	<body id="myBody">
+	<body>
 		<div class="navbar navbar-inverse navbar-fixed-top">
 			<div class="navbar-inner">
 				<div class="container-fluid">
@@ -113,7 +120,7 @@ if (($page == 'scriptconsole') || ($page == 'utilitiesrcontool'))
 if ($page != 'login')
 {
 ?>
-					<div class="nav-collapse">
+					<div class="nav-collapse collapse navbar-responsive-collapse">
 						<ul class="nav">
 							<li <?php
 	if ($tab == 0)
@@ -137,7 +144,7 @@ if ($page != 'login')
 		echo "class=\"active\"";
 	}
 ?>>
-								<a href="server.php"><i class="icon-play icon-white"></i>&nbsp;<?php echo T_('Servers'); ?></a>
+								<a href="server.php"><img src="../bootstrap/img/glyphicons_gamepad_white.png" width="14">&nbsp;<?php echo T_('Servers'); ?></a>
 							</li>
 							<li <?php
 	if ($tab == 3)
@@ -158,15 +165,16 @@ if ($page != 'login')
 									<?php echo T_('Utilities'); ?>
 									<b class="caret"></b>
 								</a>
-								<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+								<ul class="dropdown-menu">
 									<li class="nav-header"><?php echo T_('Tools'); ?></li>
-									<li><a tabindex="-1" href="utilitiesrcontool.php"><i class="icon-globe <?php echo formatIcon(); ?>"></i>&nbsp;<?php echo T_('Server RCON Tool'); ?></a></li>
-									<li><a tabindex="-1" href="utilitieslog.php"><i class="icon-list-alt <?php echo formatIcon(); ?>"></i>&nbsp;<?php echo T_('Activity Logs'); ?></a></li>
-									<li><a tabindex="-1" href="utilitiesoptimize.php"><i class="icon-wrench <?php echo formatIcon(); ?>"></i>&nbsp;<?php echo T_('Optimize Database'); ?></a></li>
-									<li><a tabindex="-1" href="utilitiesversion.php"><i class="icon-certificate <?php echo formatIcon(); ?>"></i>&nbsp;<?php echo T_('Version Check'); ?></a></li>
+									<li><a href="utilitieswebftp.php"><i class="icon-folder-open <?php echo formatIcon(); ?>"></i>&nbsp;<?php echo T_('WebFTP Tool'); ?></a></li>
+									<li><a href="utilitiesrcontool.php"><i class="icon-globe <?php echo formatIcon(); ?>"></i>&nbsp;<?php echo T_('Server RCON Tool'); ?></a></li>
+									<li><a href="utilitieslog.php"><i class="icon-list-alt <?php echo formatIcon(); ?>"></i>&nbsp;<?php echo T_('Activity Logs'); ?></a></li>
+									<li><a href="utilitiesoptimize.php"><i class="icon-wrench <?php echo formatIcon(); ?>"></i>&nbsp;<?php echo T_('Optimize Database'); ?></a></li>
+									<li><a href="utilitiesversion.php"><i class="icon-certificate <?php echo formatIcon(); ?>"></i>&nbsp;<?php echo T_('Version Check'); ?></a></li>
 									<li class="nav-header"><?php echo T_('Scripts'); ?></li>
 									<li class="dropdown-submenu">
-										<a tabindex="-1" href="#"><i class="icon-forward <?php echo formatIcon(); ?>"></i>&nbsp;<?php echo T_('Launcher'); ?></a>
+										<a href="#"><i class="icon-forward <?php echo formatIcon(); ?>"></i>&nbsp;<?php echo T_('Launcher'); ?></a>
 										<ul class="dropdown-menu">
 <?php
 
@@ -186,7 +194,7 @@ if ($page != 'login')
 		{
 ?>
 											<li class="dropdown-submenu">
-												<a tabindex="-1" href="#"><i class="icon-hdd <?php echo formatIcon(); ?>"></i>&nbsp;<?php echo htmlspecialchars($rowsBoxesNav['name'], ENT_QUOTES); ?></a>
+												<a href="#"><i class="icon-hdd <?php echo formatIcon(); ?>"></i>&nbsp;<?php echo htmlspecialchars($rowsBoxesNav['name'], ENT_QUOTES); ?></a>
 												<ul class="dropdown-menu">
 <?php
 
@@ -200,7 +208,7 @@ if ($page != 'login')
 				{
 ?>
 													<li class="dropdown-submenu">
-														<a tabindex="-1" href="#"><i class="icon-th-large <?php echo formatIcon(); ?>"></i>&nbsp;<?php echo htmlspecialchars($rowsCategoriesNav['name'], ENT_QUOTES); ?></a>
+														<a href="#"><i class="icon-th-large <?php echo formatIcon(); ?>"></i>&nbsp;<?php echo htmlspecialchars($rowsCategoriesNav['name'], ENT_QUOTES); ?></a>
 														<ul class="dropdown-menu">
 <?php
 					/**
@@ -215,7 +223,7 @@ if ($page != 'login')
 							{
 ?>
 															<li>
-																<a tabindex="-1" onclick="doScript('<?php echo $rowsScriptsNav['scriptid']; ?>', '<?php echo htmlspecialchars(addslashes($rowsScriptsNav['name']), ENT_QUOTES); ?>', 'launch')">
+																<a onclick="doScript('<?php echo $rowsScriptsNav['scriptid']; ?>', '<?php echo htmlspecialchars(addslashes($rowsScriptsNav['name']), ENT_QUOTES); ?>', 'launch')">
 																	<i class="icon-arrow-right <?php echo formatIcon(); ?>"></i>
 																	&nbsp;<?php echo htmlspecialchars($rowsScriptsNav['name'], ENT_QUOTES); ?>&nbsp;
 																	<span class="label label-inverse"><?php echo T_('Launch'); ?></span>
@@ -227,7 +235,7 @@ if ($page != 'login')
 							{
 ?>
 															<li>
-																<a tabindex="-1" onclick="doScript('<?php echo $rowsScriptsNav['scriptid']; ?>', '<?php echo htmlspecialchars($rowsScriptsNav['name'], ENT_QUOTES); ?>', 'start')">
+																<a onclick="doScript('<?php echo $rowsScriptsNav['scriptid']; ?>', '<?php echo htmlspecialchars($rowsScriptsNav['name'], ENT_QUOTES); ?>', 'start')">
 																	<i class="icon-arrow-right <?php echo formatIcon(); ?>"></i>
 																	&nbsp;<?php echo htmlspecialchars($rowsScriptsNav['name'], ENT_QUOTES); ?>&nbsp;
 																	<span class="label label-success"><?php echo T_('Start'); ?></span>
@@ -239,7 +247,7 @@ if ($page != 'login')
 							{
 ?>
 															<li>
-																<a tabindex="-1" onclick="doScript('<?php echo $rowsScriptsNav['scriptid']; ?>', '<?php echo htmlspecialchars($rowsScriptsNav['name'], ENT_QUOTES); ?>', 'stop')">
+																<a onclick="doScript('<?php echo $rowsScriptsNav['scriptid']; ?>', '<?php echo htmlspecialchars($rowsScriptsNav['name'], ENT_QUOTES); ?>', 'stop')">
 																	<i class="icon-arrow-right <?php echo formatIcon(); ?>"></i>
 																	&nbsp;<?php echo htmlspecialchars($rowsScriptsNav['name'], ENT_QUOTES); ?>&nbsp;
 																	<span class="label label-warning"><?php echo T_('Stop'); ?></span>
@@ -253,7 +261,7 @@ if ($page != 'login')
 					}
 					else
 					{
-						echo "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<li><a tabindex=\"-1\" href=\"#\"><span class=\"label\"><i class=\"icon-warning-sign ".formatIcon()."\"></i>&nbsp;".T_('No Scripts Available')."</span></a></li>";
+						echo "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t<li><a href=\"#\"><span class=\"label\"><i class=\"icon-warning-sign ".formatIcon()."\"></i>&nbsp;".T_('No Scripts Available')."</span></a></li>";
 					}
 ?>
 
@@ -266,7 +274,7 @@ if ($page != 'login')
 			}
 			else
 			{
-				echo "\t\t\t\t\t\t\t\t\t\t\t\t\t<li><a tabindex=\"-1\" href=\"#\"><span class=\"label\"><i class=\"icon-warning-sign ".formatIcon()."\"></i>&nbsp;".T_('No Categories Available')."</span></a></li>";
+				echo "\t\t\t\t\t\t\t\t\t\t\t\t\t<li><a href=\"#\"><span class=\"label\"><i class=\"icon-warning-sign ".formatIcon()."\"></i>&nbsp;".T_('No Categories Available')."</span></a></li>";
 			}
 ?>
 
@@ -279,7 +287,7 @@ if ($page != 'login')
 	}
 	else
 	{
-		echo "\t\t\t\t\t\t\t\t\t\t\t<li><a tabindex=\"-1\" href=\"#\"><span class=\"label\"><i class=\"icon-warning-sign ".formatIcon()."\"></i>&nbsp;".T_('No Boxes Available')."</span></a></li>";
+		echo "\t\t\t\t\t\t\t\t\t\t\t<li><a href=\"#\"><span class=\"label\"><i class=\"icon-warning-sign ".formatIcon()."\"></i>&nbsp;".T_('No Boxes Available')."</span></a></li>";
 	}
 
 ?>
@@ -287,8 +295,8 @@ if ($page != 'login')
 										</ul>
 									</li>
 									<li class="nav-header"><?php echo T_('Misc'); ?></li>
-									<li><a tabindex="-1" href="utilitiesphpinfo.php"><i class="icon-info-sign <?php echo formatIcon(); ?>"></i>&nbsp;<?php echo T_('PHP Info'); ?></a></li>
-									<li><a tabindex="-1" href="systemlicense.php"><i class="icon-info-sign <?php echo formatIcon(); ?>"></i>&nbsp;<?php echo T_('License Information'); ?></a></li>
+									<li><a href="utilitiesphpinfo.php"><i class="icon-info-sign <?php echo formatIcon(); ?>"></i>&nbsp;<?php echo T_('PHP Info'); ?></a></li>
+									<li><a href="systemlicense.php"><i class="icon-info-sign <?php echo formatIcon(); ?>"></i>&nbsp;<?php echo T_('License Information'); ?></a></li>
 								</ul>
 							</li>
 							<li class="dropdown <?php
@@ -302,18 +310,19 @@ if ($page != 'login')
 									<?php echo T_('Configuration'); ?>
 									<b class="caret"></b>
 								</a>
-								<ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+								<ul class="dropdown-menu">
 									<li class="nav-header"><?php echo T_('General'); ?></li>
-									<li><a tabindex="-1" href="configgeneral.php"><i class="icon-wrench <?php echo formatIcon(); ?>"></i>&nbsp;<?php echo T_('Panel Settings'); ?></a></li>
+									<li><a href="configgeneral.php"><i class="icon-wrench <?php echo formatIcon(); ?>"></i>&nbsp;<?php echo T_('Panel Settings'); ?></a></li>
 									<li class="nav-header"><?php echo T_('Scripts'); ?></li>
-									<li><a tabindex="-1" href="script.php"><i class="icon-cog <?php echo formatIcon(); ?>"></i>&nbsp;<?php echo T_('Scripts'); ?></a></li>
-									<li><a tabindex="-1" href="scriptcatmanage.php"><i class="icon-cog <?php echo formatIcon(); ?>"></i>&nbsp;<?php echo T_('Categories'); ?></a></li>
+									<li><a href="script.php"><i class="icon-cog <?php echo formatIcon(); ?>"></i>&nbsp;<?php echo T_('Scripts'); ?></a></li>
+									<li><a href="scriptcatmanage.php"><i class="icon-cog <?php echo formatIcon(); ?>"></i>&nbsp;<?php echo T_('Categories'); ?></a></li>
 									<li class="nav-header"><?php echo T_('Management'); ?></li>
-									<li><a tabindex="-1" href="configadmin.php"><i class="icon-user <?php echo formatIcon(); ?>"></i>&nbsp;<?php echo T_('Administrators'); ?></a></li>
-									<li><a tabindex="-1" href="configgame.php"><i class="icon-cog <?php echo formatIcon(); ?>"></i>&nbsp;<?php echo T_('Games'); ?></a></li>
-									<li><a tabindex="-1" href="configgroup.php"><i class="icon-cog <?php echo formatIcon(); ?>"></i>&nbsp;<?php echo T_('Groups'); ?></a></li>
+									<li><a href="configadmin.php"><i class="icon-user <?php echo formatIcon(); ?>"></i>&nbsp;<?php echo T_('Administrators'); ?></a></li>
+									<li><a href="configgame.php"><i class="icon-cog <?php echo formatIcon(); ?>"></i>&nbsp;<?php echo T_('Games'); ?></a></li>
+									<li><a href="configgroup.php"><i class="icon-cog <?php echo formatIcon(); ?>"></i>&nbsp;<?php echo T_('Groups'); ?></a></li>
 									<li class="nav-header"><?php echo T_('Misc'); ?></li>
-									<li><a tabindex="-1" href="configcron.php"><i class="icon-info-sign <?php echo formatIcon(); ?>"></i>&nbsp;<?php echo T_('Cron Settings'); ?></a></li>
+									<li><a href="configcron.php"><i class="icon-info-sign <?php echo formatIcon(); ?>"></i>&nbsp;<?php echo T_('Cron Settings'); ?></a></li>
+									<li><a href="configapikey.php"><i class="icon-info-sign <?php echo formatIcon(); ?>"></i>&nbsp;<?php echo T_('API Key'); ?></a></li>
 								</ul>
 							</li>
 						</ul>
@@ -350,9 +359,6 @@ if ($page != 'login')
 ?>
 							<li>
 								<a href="#" id="clock" rel="tooltip" title="<?php echo date('l | F j, Y | H:i'); ?>"><i class="icon-time icon-white"></i></a>
-							</li>
-							<li>
-								<a href="#myBody" id="gototop" rel="tooltip" title="Back to Top"><i class="icon-arrow-up icon-white"></i></a>
 							</li>
 							<li>
 								<a href="myaccount.php" id="me" rel="tooltip" title="<?php echo T_('My Account'); ?>"><i class="icon-user icon-white"></i></a>

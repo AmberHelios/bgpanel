@@ -22,7 +22,7 @@
  * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
  * @copyleft	2013
  * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 8
+ * @version		(Release 0) DEVELOPER BETA 9
  * @link		http://www.bgpanel.net/
  */
 
@@ -31,17 +31,13 @@
 $page = 'server';
 $tab = 2;
 $isSummary = TRUE;
-###
-if (isset($_GET['id']) && is_numeric($_GET['id']))
-{
-	$serverid = $_GET['id'];
-}
-else
+
+if ( !isset($_GET['id']) || !is_numeric($_GET['id']) )
 {
 	header( 'Location: index.php' );
 	die();
 }
-###
+
 $return = 'server.php';
 
 
@@ -51,6 +47,8 @@ require("./libs/lgsl/lgsl_class.php");
 
 
 $title = T_('Server Summary');
+
+$serverid = mysql_real_escape_string($_GET['id']);
 
 
 if (query_numrows( "SELECT `name` FROM `".DBPREFIX."server` WHERE `serverid` = '".$serverid."'" ) == 0)
@@ -600,7 +598,7 @@ unset($logs);
 					</li>
 				</ul>
 			</div>
-			<script type="text/javascript">
+			<script>
 			function dlScrLog()
 			{
 				if (confirm("<?php echo T_('Download SCREENLOG ?'); ?>"))

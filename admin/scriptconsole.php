@@ -22,7 +22,7 @@
  * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
  * @copyleft	2013
  * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 8
+ * @version		(Release 0) DEVELOPER BETA 9
  * @link		http://www.bgpanel.net/
  */
 
@@ -31,16 +31,13 @@
 $page = 'scriptconsole';
 $tab = 5;
 $isSummary = TRUE;
-###
-if (isset($_GET['id']) && is_numeric($_GET['id']))
-{
-	$scriptid = $_GET['id'];
-}
-else
+
+if ( !isset($_GET['id']) || !is_numeric($_GET['id']) )
 {
 	exit('Error:ScriptID error.');
 }
-###
+
+$scriptid = $_GET['id'];
 $return = 'scriptconsole.php?id='.urlencode($scriptid);
 
 
@@ -52,6 +49,8 @@ require_once("../libs/phpseclib/ANSI.php");
 
 
 $title = T_('Script Console');
+
+$scriptid = mysql_real_escape_string($_GET['id']);
 
 
 if (query_numrows( "SELECT `name` FROM `".DBPREFIX."script` WHERE `scriptid` = '".$scriptid."'" ) == 0)
@@ -120,7 +119,7 @@ else
 	// We retrieve screen contents
 	if (!empty($session)) {
 		$ssh->write("screen -R ".$session."\n");
-		$ssh->setTimeout(1);
+		$ssh->setTimeout(1.1);
 
 		@$ansi->appendString($ssh->read());
 		$screenContents = htmlspecialchars_decode(strip_tags($ansi->getScreen()));
@@ -148,15 +147,11 @@ include("./bootstrap/notifications.php");
 				<li><a href="scriptprofile.php?id=<?php echo $scriptid; ?>">Profile</a></li>
 				<li class="active"><a href="scriptconsole.php?id=<?php echo $scriptid; ?>">Console</a></li>
 			</ul>
-			<script type="text/javascript">
-			$(document).ready(function() {
-				prettyPrint();
-			});
-			</script>
-			<div class="page-header">
-				<h1><small><?php echo htmlspecialchars($rows['name'], ENT_QUOTES); ?></small></h1>
-			</div>
-<pre class="prettyprint">
+
+			<h1><small><?php echo htmlspecialchars($rows['name'], ENT_QUOTES); ?></small></h1>
+
+			<div id="ajaxicon" style="float: right; margin-top: 32px; margin-right: 8px;"></div><br />
+<pre class="prettyprint" id="console">
 <?php
 
 // Each lines are a value of rowsTable
@@ -211,6 +206,32 @@ else
 						</li>
 					</ul>
 				</div>
+				<script>
+				<!-- AJAX CONSOLE AUTO-LOAD -->
+
+				$(document).ready(function() {
+					function refreshConsole()
+					{
+						jQuery.ajax({
+							url: '<?php echo 'scriptprocess.php?task=scriptconsole&id='.urlencode($scriptid); ?>',
+							success: function(data, textStatus, jqXHR) {
+								$( "#console" ).html( data );
+								prettyPrint();
+								$( "#ajaxicon" ).html( '' );
+							},
+							error: function(jqXHR, textStatus, errorThrown) {
+								$( "#console" ).html( 'Loading...' );
+							}
+						});
+					}
+
+					var refreshId = setInterval( function()
+					{
+						$( "#ajaxicon" ).html( "<img src='../bootstrap/img/ajax-loader.gif' alt='loading...' />&nbsp;Loading..." );
+						refreshConsole();
+					}, 5000 );
+				});
+				</script>
 <?php
 
 

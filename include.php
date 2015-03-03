@@ -22,7 +22,7 @@
  * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
  * @copyleft	2013
  * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 8
+ * @version		(Release 0) DEVELOPER BETA 9
  * @link		http://www.bgpanel.net/
  */
 
@@ -149,6 +149,12 @@ unset($bgpCoreInfo);
  * The key is stored into the file: ".ssh/passphrase"
  */
 define('CRYPT_KEY', file_get_contents("./.ssh/passphrase"));
+
+
+/**
+ * API_KEY is used to access / protect contents
+ */
+define('API_KEY', substr(CRYPT_KEY, (strlen(CRYPT_KEY) / 2)));
 
 
 /**

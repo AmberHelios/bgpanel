@@ -22,31 +22,33 @@
  * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
  * @copyleft	2013
  * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 8
+ * @version		(Release 0) DEVELOPER BETA 9
  * @link		http://www.bgpanel.net/
  */
+
 
 
 $page = 'clientprofile';
 $tab = 1;
 $isSummary = TRUE;
-###
-if (isset($_GET['id']) && is_numeric($_GET['id']))
-{
-	$clientid = $_GET['id'];
-}
-else
+
+if ( !isset($_GET['id']) || !is_numeric($_GET['id']) )
 {
 	exit('Error: ClientID error.');
 }
-###
+
+$clientid = $_GET['id'];
 $return = 'clientprofile.php?id='.urlencode($clientid);
 
 
 require("../configuration.php");
 require("./include.php");
 
+
 $title = T_('Client Profile');
+
+$clientid = mysql_real_escape_string($_GET['id']);
+
 
 if (query_numrows( "SELECT `username` FROM `".DBPREFIX."client` WHERE `clientid` = '".$clientid."'" ) == 0)
 {
@@ -81,7 +83,6 @@ include("./bootstrap/notifications.php");
 						<input type="text" name="username" class="span4" value="<?php echo htmlspecialchars($rows['username'], ENT_QUOTES); ?>">
 					<label><?php echo T_('Password'); ?></label>
 						<input type="password" name="password" class="span3">
-						<span class="help-inline"><?php echo T_('Leave blank for no change'); ?></span>
 					<label><?php echo T_('Status'); ?></label>
 						<div class="btn-group" data-toggle="buttons-radio" style="margin-bottom: 5px;">
 							<a class="btn btn-primary <?php

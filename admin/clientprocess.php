@@ -22,7 +22,7 @@
  * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
  * @copyleft	2013
  * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 8
+ * @version		(Release 0) DEVELOPER BETA 9
  * @link		http://www.bgpanel.net/
  */
 
@@ -213,7 +213,10 @@ switch (@$task)
 		{
 			$error .= T_('Username is already in use. ');
 		}
-		if ((!empty($password)) && ($passwordLength <= 3))
+		if (empty($password)) {
+			$error .= T_('No password. ');
+		}
+		else if ($passwordLength <= 3)
 		{
 			$error .= T_('Password is unsecure. ');
 		}
@@ -232,39 +235,27 @@ switch (@$task)
 			die();
 		}
 		###
-		if (empty($password))
-		{
-			query_basic( "UPDATE `".DBPREFIX."client` SET
-				`username` = '".$username."',
-				`firstname` = '".$firstname."',
-				`lastname` = '".$lastname."',
-				`email` = '".$email."',
-				`status` = '".$status."' WHERE `clientid` = '".$clientid."'" );
-		}
-		else
-		{
-			$password2 = $password; //Temp var for the email
-			$salt = hash('sha512', $username); //Salt
-			$password = hash('sha512', $salt.$password); //Hashed password with salt
-			query_basic( "UPDATE `".DBPREFIX."client` SET
-				`username` = '".$username."',
-				`password` = '".$password."',
-				`firstname` = '".$firstname."',
-				`lastname` = '".$lastname."',
-				`email` = '".$email."',
-				`status` = '".$status."' WHERE `clientid` = '".$clientid."'" );
-		}
-		###
+		$password2 = $password; //Temp var for the email
+		$salt = hash('sha512', $username); //Salt
+		$password = hash('sha512', $salt.$password); //Hashed password with salt
+		query_basic( "UPDATE `".DBPREFIX."client` SET
+			`username` = '".$username."',
+			`password` = '".$password."',
+			`firstname` = '".$firstname."',
+			`lastname` = '".$lastname."',
+			`email` = '".$email."',
+			`status` = '".$status."' WHERE `clientid` = '".$clientid."'" );
+
 		//Adding event to the database
 		$message = "Client Edited: ".$username." (by Admin)";
 		query_basic( "INSERT INTO `".DBPREFIX."log` SET `clientid` = '".$clientid."', `message` = '".$message."', `name` = '".mysql_real_escape_string($_SESSION['adminfirstname'])." ".mysql_real_escape_string($_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
 		###
-		if ( ($sendemail == 'on') && (!empty($password) ) )
+		if ( ($sendemail == 'on') && (!empty($password)) )
 		{
 			$systemurl = query_fetch_assoc( "SELECT `value` FROM `".DBPREFIX."config` WHERE `setting` = 'systemurl' LIMIT 1" );
 			###
 			$to = $email;
-			$subject = 'Game Panel Account Information';
+			$subject = T_('Game Panel Account Information');
 			$message = T_("Dear")." {$firstname} {$lastname},<br /><br /><u>".T_('Here is your new account login details:')."</u><br />".T_('Username:')." {$username}<br />".T_('Email Address:')." {$email}<br />".T_('Password:')." {$password2}<br />".T_('Game Panel Link:')." ".$systemurl['value'];
 			###
 			$headers  = 'MIME-Version: 1.0' . "\r\n";
@@ -290,7 +281,7 @@ switch (@$task)
 		break;
 
 	case 'clientdelete':
-		$clientid = $_GET['id'];
+		$clientid = mysql_real_escape_string($_GET['id']);
 		###
 		$error = '';
 		###
@@ -319,7 +310,7 @@ switch (@$task)
 		###
 		//We have to remove the client from any associated group
 		query_basic( "DELETE FROM `".DBPREFIX."groupMember` WHERE `clientid` = '".$clientid."' LIMIT 1" );
-		###
+
 		//Adding event to the database
 		$message = 'Client Deleted: '.mysql_real_escape_string($username['username']);
 		query_basic( "INSERT INTO `".DBPREFIX."log` SET `clientid` = '".$clientid."', `message` = '".$message."', `name` = '".mysql_real_escape_string($_SESSION['adminfirstname'])." ".mysql_real_escape_string($_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );

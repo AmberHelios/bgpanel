@@ -22,7 +22,7 @@
  * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
  * @copyleft	2013
  * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 8
+ * @version		(Release 0) DEVELOPER BETA 9
  * @link		http://www.bgpanel.net/
  */
 
@@ -46,10 +46,8 @@ if (!defined('LICENSE'))
 function addBin2GameServerPath( $path, $game )
 {
 	// Known List
-	$binaries = array(
-		"Minecraft"							=> "minecraft_server.jar",
-		"Multi Theft Auto"					=> "mta-server",
-		"San Andreas: Multiplayer (SA-MP)"	=> "samp03svr" );
+	$binaries = parse_ini_file( INCLUDES_INI_DIR . "/game-binaries.ini" );
+	$binaries = array_flip($binaries);
 
 	// Fix path
 	$len = strlen($path);

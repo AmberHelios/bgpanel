@@ -22,7 +22,7 @@
  * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
  * @copyleft	2013
  * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 8
+ * @version		(Release 0) DEVELOPER BETA 9
  * @link		http://www.bgpanel.net/
  */
 
@@ -50,9 +50,9 @@ switch (@$task)
 	case 'configadminadd':
 		$access = mysql_real_escape_string($_POST['access']);
 		$firstname = mysql_real_escape_string($_POST['firstname']);
-		$firstname = ucwords($firstname); //Format the first name as a proper noun
+		$firstname = ucwords(mysql_real_escape_string($firstname)); //Format the first name as a proper noun
 		$lastname = mysql_real_escape_string($_POST['lastname']);
-		$lastname = ucwords($lastname); //Format the last name as a proper noun
+		$lastname = ucwords(mysql_real_escape_string($lastname)); //Format the last name as a proper noun
 		$email = mysql_real_escape_string($_POST['email']);
 		$email = strtolower($email); //Format the email to lower case
 		$username = mysql_real_escape_string($_POST['username']);
@@ -145,9 +145,9 @@ switch (@$task)
 		$adminid = mysql_real_escape_string($_POST['adminid']);
 		$access = mysql_real_escape_string($_POST['access']);
 		$firstname = mysql_real_escape_string($_POST['firstname']);
-		$firstname = ucwords($firstname); //Format the first name as a proper noun
+		$firstname = ucwords(mysql_real_escape_string($firstname)); //Format the first name as a proper noun
 		$lastname = mysql_real_escape_string($_POST['lastname']);
-		$lastname = ucwords($lastname); //Format the last name as a proper noun
+		$lastname = ucwords(mysql_real_escape_string($lastname)); //Format the last name as a proper noun
 		$email = mysql_real_escape_string($_POST['email']);
 		$email = strtolower($email); //Format the email to lower case
 		$username = mysql_real_escape_string($_POST['username']);
@@ -187,8 +187,10 @@ switch (@$task)
 		{
 			$error .= T_('Username is already in use by another administrator. ');
 		}
-		if (!empty($password))
-		{
+		if (empty($password)) {
+			$error .= T_('No password. ');
+		}
+		else {
 			if ($passwordLength <= 3)
 			{
 				$error .= T_('Password is unsecure. ');
@@ -214,30 +216,17 @@ switch (@$task)
 		}
 		###
 		//Processing password
-		if (empty($password))
-		{
-			query_basic( "UPDATE `".DBPREFIX."admin` SET
-				`username` = '".$username."',
-				`firstname` = '".$firstname."',
-				`lastname` = '".$lastname."',
-				`email` = '".$email."',
-				`access` = '".$access."',
-				`status` = '".$status."' WHERE `adminid` = '".$adminid."'" );
-		}
-		else
-		{
-			$salt = hash('sha512', $username); //Salt
-			$password = hash('sha512', $salt.$password); //Hashed password with salt
-			query_basic( "UPDATE `".DBPREFIX."admin` SET
-				`username` = '".$username."',
-				`firstname` = '".$firstname."',
-				`lastname` = '".$lastname."',
-				`email` = '".$email."',
-				`password` = '".$password."',
-				`access` = '".$access."',
-				`status` = '".$status."' WHERE `adminid` = '".$adminid."'" );
-		}
-		###
+		$salt = hash('sha512', $username); //Salt
+		$password = hash('sha512', $salt.$password); //Hashed password with salt
+		query_basic( "UPDATE `".DBPREFIX."admin` SET
+			`username` = '".$username."',
+			`firstname` = '".$firstname."',
+			`lastname` = '".$lastname."',
+			`email` = '".$email."',
+			`password` = '".$password."',
+			`access` = '".$access."',
+			`status` = '".$status."' WHERE `adminid` = '".$adminid."'" );
+
 		$_SESSION['msg1'] = T_('Admin Updated Successfully!');
 		$_SESSION['msg2'] = T_('Your changes to the admin have been saved.');
 		$_SESSION['msg-type'] = 'success';
@@ -246,7 +235,7 @@ switch (@$task)
 		break;
 
 	case 'configadmindelete':
-		$adminid = $_GET['id'];
+		$adminid = mysql_real_escape_string($_GET['id']);
 		###
 		$error = '';
 		###
@@ -272,9 +261,11 @@ switch (@$task)
 			header( "Location: index.php" );
 			die();
 		}
-		###
+
+		$username = query_fetch_assoc( "SELECT `username` FROM `".DBPREFIX."admin` WHERE `adminid` = '".$adminid."' LIMIT 1" );
+
 		query_basic( "DELETE FROM `".DBPREFIX."admin` WHERE `adminid` = '".$adminid."' LIMIT 1" );
-		###
+
 		$_SESSION['msg1'] = T_('Admin Deleted Successfully!');
 		$_SESSION['msg2'] = T_('The selected admin has been removed.');
 		$_SESSION['msg-type'] = 'success';

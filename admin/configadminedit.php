@@ -22,7 +22,7 @@
  * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
  * @copyleft	2013
  * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 8
+ * @version		(Release 0) DEVELOPER BETA 9
  * @link		http://www.bgpanel.net/
  */
 
@@ -31,23 +31,24 @@
 $page = 'configadminedit';
 $tab = 5;
 $isSummary = TRUE;
-###
-if (isset($_GET['id']) && is_numeric($_GET['id']))
-{
-	$adminid = $_GET['id'];
-}
-else
+
+if ( !isset($_GET['id']) || !is_numeric($_GET['id']) )
 {
 	exit('Error: AdminID error.');
 }
-###
+
+$adminid = $_GET['id'];
 $return = 'configadminedit.php?id='.urlencode($adminid);
 
 
 require("../configuration.php");
 require("./include.php");
 
+
 $title = T_('Edit Administrator');
+
+$adminid = mysql_real_escape_string($_GET['id']);
+
 
 if (query_numrows( "SELECT `username` FROM `".DBPREFIX."admin` WHERE `adminid` = '".$adminid."'" ) == 0)
 {
@@ -76,7 +77,6 @@ include("./bootstrap/notifications.php");
 						<input type="text" name="username" class="span4" value="<?php echo htmlspecialchars($rows['username'], ENT_QUOTES); ?>">
 					<label><?php echo T_('Password'); ?></label>
 						<input type="password" name="password" class="span3">
-						<span class="help-inline"><?php echo T_('Leave blank for no change'); ?></span>
 					<label><?php echo T_('Confirm Password'); ?></label>
 						<input type="password" name="password2" class="span3">
 					<label><?php echo T_('Status'); ?></label>
@@ -132,12 +132,6 @@ if ($rows['access'] == 'Full')
 	echo "selected=\"selected\"";
 }
 ?>><?php echo T_('Full Administrator'); ?></option>
-							<option value="Limited" <?php
-if ($rows['access'] == 'Limited')
-{
-	echo "selected=\"selected\"";
-}
-?>><?php echo T_('Limited Administrator'); ?></option>
 						</select>
 					<div style="text-align: center; margin-top: 19px;">
 						<button type="submit" class="btn btn-primary"><?php echo T_('Save Changes'); ?></button>

@@ -22,7 +22,7 @@
  * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
  * @copyleft	2013
  * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 8
+ * @version		(Release 0) DEVELOPER BETA 9
  * @link		http://www.bgpanel.net/
  */
 
@@ -39,19 +39,12 @@ if (!defined('LICENSE'))
 /**
  * Available Languages
  */
-$languages = array(
-	'English'	=>	'en_EN',
-	'Spanish'	=>	'es_ES',
-	'French'	=>	'fr_FR',
-	'Dutch'		=>	'nl_NL',
-	'Polish'	=>	'pl_PL',
-	'Russian'	=>	'ru_RU'
-	);
+$global_languages = parse_ini_file( INCLUDES_INI_DIR . "/languages.ini" );
 
 /**
  * Define language for get-text translator
  *
- * Directory structure for traduction must be:
+ * Directory structure for the translation must be:
  *		./locale/Lang/LC_MESSAGES/messages.mo
  * Example (French):
  *		./locale/fr_FR/LC_MESSAGES/messages.mo
@@ -59,8 +52,9 @@ $languages = array(
 function defineLanguage($lang)
 {
 	$encoding = 'UTF-8';
+	$languages = parse_ini_file( INCLUDES_INI_DIR . "/languages.ini" );
 
-	if (isset($lang)) {
+	if ( isset($lang) && in_array($lang, $languages) ) {
 		$locale = $lang;
 	} else {
 		$locale = DEFAULT_LOCALE;

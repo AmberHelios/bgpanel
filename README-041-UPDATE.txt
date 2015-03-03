@@ -4,8 +4,8 @@
 ===================================================================
 
 http://www.bgpanel.net/
-Version 0.4.5 (Release 0 DEVELOPER BETA 8)
-November 23rd, 2013
+Version 0.4.7 (Release 0 DEVELOPER BETA 9)
+November 24th, 2013
 
 ===================================================================
 

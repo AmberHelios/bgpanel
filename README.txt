@@ -4,8 +4,8 @@
 ===================================================================
 
 http://www.bgpanel.net/
-Version 0.4.5 (Release 0 DEVELOPER BETA 8)
-November 23rd, 2013
+Version 0.4.7 (Release 0 DEVELOPER BETA 9)
+November 24th, 2013
 
 ===================================================================
 							Terms of Use
@@ -67,9 +67,10 @@ More information at <http://shop.highsoft.com/faq#non-commercial-redistribution>
 Bright Game Panel uses several GPL compliant libraries.
 The following libraries are currently included into the panel :
 
+- Pydio a.k.a AjaXplorer 5 ( 5.2.3 ) by Charles Du Jeu ( http://pyd.io/ )
 - LGSL ( Live Game Server List ) by Richard Perry ( http://www.greycube.com/ )
 - pChart 2.1.3 ( http://www.pchart.net/ )
-- phpseclib build-364 ( http://phpseclib.sourceforge.net/ )
+- phpseclib build-524 ( http://phpseclib.sourceforge.net/ )
 - securimage 3.5.1 (June 22, 2013) ( http://www.phpcaptcha.org/ )
 - php-gettext 1.0.11 ( https://launchpad.net/php-gettext/ )
 
@@ -98,6 +99,8 @@ The following libraries are currently included into the panel :
 11. GD Extension
 12. FreeType Extension
 13. SimpleXML Extension
+14. DOM Xml Enabled (AJXP)
+15. MCrypt Enabled
 
 ===================================================================
 						INSTALLATION INSTRUCTIONS
@@ -111,13 +114,32 @@ The following libraries are currently included into the panel :
 
 4. CHMOD file '/.ssh/passphrase' to 0777.
 
-5. Run the installation script at http://www.yourdomain.com/install/index.php
+5. Make the '/ajxp/data/' folder writeable by the server
+	|-> For example:
+		"chown -R www-data /ajxp/data/"
+		"chmod -R 0777 /ajxp/data/"
 
-6. Once complete, delete the install folder from your web server.
+6. Run the installation script at http://www.yourdomain.com/install/index.php
 
-7. CHMOD file '/.ssh/passphrase' to 0644.
+7. Once complete, delete the install folder from your web server.
 
-8. Do not forget to schedule the cron job.
+8. CHMOD file '/.ssh/passphrase' to 0644.
+
+9. Edit in your 'php.ini' the following VARS :
+	|-> By default : '/etc/php5/apache2/php.ini'
+
+	; Maximum size of POST data that PHP will accept.
+	; http://php.net/post-max-size
+	post_max_size = 512M
+
+	; Maximum allowed size for uploaded files.
+	; http://php.net/upload-max-filesize
+	upload_max_filesize = 512M
+
+10. Restart Apache service
+	|-> 'root@server:/# service apache2 restart'
+
+11. Do not forget to schedule the cron job.
 
 Enjoy BrightGamePanel !
 
@@ -145,11 +167,30 @@ Enjoy BrightGamePanel !
 
 6. CHMOD file '/.ssh/passphrase' to 0777.
 
-7. Run the installation script at http://www.yourdomain.com/install/index.php
+7. Make the '/ajxp/data/' folder writeable by the server
+	|-> For example:
+		"chown -R www-data /ajxp/data/"
+		"chmod -R 0777 /ajxp/data/"
+
+8. Run the installation script at http://www.yourdomain.com/install/index.php
 	|-> During the installation select "Update to the Last Version".
 
-8. Once complete, delete the install folder from your web server.
+9. Once complete, delete the install folder from your web server.
 
-9. CHMOD file '/.ssh/passphrase' to 0644.
+10. CHMOD file '/.ssh/passphrase' to 0644.
+
+11. Edit in your 'php.ini' the following VARS :
+	|-> By default : '/etc/php5/apache2/php.ini'
+
+	; Maximum size of POST data that PHP will accept.
+	; http://php.net/post-max-size
+	post_max_size = 512M
+
+	; Maximum allowed size for uploaded files.
+	; http://php.net/upload-max-filesize
+	upload_max_filesize = 512M
+
+12. Restart Apache service
+	|-> 'root@server:/# service apache2 restart'
 
 Enjoy your updated version of Bright Game Panel !

@@ -22,7 +22,7 @@
  * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
  * @copyleft	2013
  * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 8
+ * @version		(Release 0) DEVELOPER BETA 9
  * @link		http://www.bgpanel.net/
  */
 
@@ -149,7 +149,7 @@ while ($rowsBoxes = mysql_fetch_assoc($boxes))
 if (mysql_num_rows($boxes) != 0)
 {
 ?>
-				<script type="text/javascript">
+				<script>
 				$(document).ready(function() {
 					$("#boxes").tablesorter({
 						headers: {

@@ -22,7 +22,7 @@
  * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
  * @copyleft	2013
  * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 8
+ * @version		(Release 0) DEVELOPER BETA 9
  * @link		http://www.bgpanel.net/
  */
 
@@ -208,12 +208,13 @@ switch (@$task)
 			$_SESSION['msg2'] = $newClient.T_(' has been added to the group.');
 			$_SESSION['msg-type'] = 'success';
 		}
+
 		header( "Location: configgroupedit.php?id=".urlencode($groupid) );
 		die();
 		break;
 
 	case 'configgroupdelete':
-		$groupid = $_GET['id'];
+		$groupid = mysql_real_escape_string($_GET['id']);
 		###
 		$error = '';
 		###
@@ -275,9 +276,9 @@ switch (@$task)
 				unset($groupids);
 			}
 		}
-		###
+
 		query_basic( "DELETE FROM `".DBPREFIX."group` WHERE `groupid` = '".$groupid."' LIMIT 1" );
-		###
+
 		$_SESSION['msg1'] = T_('Group Deleted Successfully!');
 		$_SESSION['msg2'] = T_('The selected group has been removed.');
 		$_SESSION['msg-type'] = 'success';

@@ -23,15 +23,15 @@
  * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
  * @copyleft	2013
  * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 8
+ * @version		(Release 0) DEVELOPER BETA 9
  * @link		http://www.bgpanel.net/
  */
 
 
 /**
  *	@Class:		Game Installer Main Class
- *	@Version:	1.0
- *	@Date:		20/08/2013
+ *	@Version:	1.0.1
+ *	@Date:		10/05/2014
  */
 class GameInstaller {
 
@@ -103,13 +103,12 @@ class GameInstaller {
 	public $actions = array();
 
 	/**
-	 * Error Messages
-	 * Associative Array That Holds Errors If Any
+	 * Last Error Message
 	 *
-	 * @var array
+	 * @var String
 	 * @access public
 	 */
-	//public $errors;
+	public $error = '';
 
 	//------------------------------------------------------------------------------------------------------------+
 	//------------------------------------------------------------------------------------------------------------+
@@ -170,6 +169,18 @@ class GameInstaller {
 	}
 
 	//------------------------------------------------------------------------------------------------------------+
+
+	/**
+	 * Error handler
+	 *
+	 * @param String $error
+	 * @return void
+	 * @access private
+	 */
+	private function logError( $error )
+	{
+		$this->error = $error;
+	}
 
 	/**
 	 * Check If The Specified Game Is Supported
@@ -402,9 +413,9 @@ class GameInstaller {
 					$query .= "rm ".$this->repoPath.'.cachescript ; '; // Delete install script at the end
 					$query .= "rm ".$this->repoPath.'.cacheuid ; '; // Delete screen uid
 
-					$this->executeQuery( $query, 'makeRepo' );
+					$execute = $this->executeQuery( $query, 'makeRepo' );
 
-					return TRUE;
+					return $execute;
 				}
 			}
 		}
@@ -423,15 +434,11 @@ class GameInstaller {
 	public function deleteRepo( )
 	{
 		if (!empty( $this->repoPath )) {
-			$query = 'sleep 0.2 ; ';
-			$query .= "rm -rf ".$this->repoPath.'* ; '; // Flush all contents
-			$query .= "rm -rf ".$this->repoPath.'.* ; '; // Flush all cached contents
-
-			$this->executeQuery( $query, 'makeRepo' );
+			$execute = $this->executeQuery( 'deleteQuery', 'deleteRepo' ); // Remove the repository folder
 
 			sleep(0.4);
 
-			return TRUE;
+			return $execute;
 		}
 
 		return FALSE;
@@ -474,9 +481,9 @@ class GameInstaller {
 					$query .= "rm ".$this->gameServerPath.'.cachescript ; '; // Delete install script at the end
 					$query .= "rm ".$this->gameServerPath.'.cacheuid ; '; // Delete screen uid
 
-					$this->executeQuery( $query, 'installGame' );
+					$execute = $this->executeQuery( $query, 'installGame' );
 
-					return TRUE;
+					return $execute;
 				}
 			}
 		}
@@ -519,9 +526,9 @@ class GameInstaller {
 					$query .= "rm ".$this->gameServerPath.'.cachescript ; '; // Delete install script at the end
 					$query .= "rm ".$this->gameServerPath.'.cacheuid ; '; // Delete screen uid
 
-					$this->executeQuery( $query, 'updateGame' );
+					$execute = $this->executeQuery( $query, 'updateGame' );
 
-					return TRUE;
+					return $execute;
 				}
 			}
 		}
@@ -540,14 +547,11 @@ class GameInstaller {
 	public function deleteGameServer( )
 	{
 		if (!empty( $this->gameServerPath )) {
-			$query = 'sleep 0.2 ; ';
-			$query .= "rm -rf ".$this->gameServerPath.' ; '; // Remove the game server folder
-
-			$this->executeQuery( $query, 'installGame' );
+			$execute = $this->executeQuery( 'deleteQuery', 'deleteGame' ); // Remove the game server folder
 
 			sleep(0.4);
 
-			return TRUE;
+			return $execute;
 		}
 
 		return FALSE;
@@ -622,6 +626,26 @@ class GameInstaller {
 							return $queryParts;
 						break;
 
+						case 'untarbz2':
+							$queryParts = "echo \"Status: Decompressing Files...\" >> ".$this->repoPath.'.cacheinfo ; ';
+							foreach ($values as $value) {
+								$queryParts .= 'tar -C '.$this->repoPath.' -xjf '.$this->repoPath.$value['value'].' ; '; // Decompress + extract (bzip2)
+							}
+							$queryParts .= "echo \"Status: Decompress Done\" >> ".$this->repoPath.'.cacheinfo ; ';
+							return $queryParts;
+						break;
+
+						case 'merge':
+							$queryParts = "echo \"Status: Merging Files...\" >> ".$this->repoPath.'.cacheinfo ; ';
+							foreach ($values as $value) {
+								// We assume suffix-length=2
+								$queryParts .= 'cat '.substr($this->repoPath.$value['value'], 0, -2).'* > '.substr($this->repoPath.$value['value'], 0, -3).' ; '; // Merge
+								break; // One iteration is sufficient
+							}
+							$queryParts .= "echo \"Status: Merge Done\" >> ".$this->repoPath.'.cacheinfo ; ';
+							return $queryParts;
+						break;
+
 						case 'move':
 							$queryParts = "echo \"Status: Moving Files...\" >> ".$this->repoPath.'.cacheinfo ; ';
 							foreach ($values as $value) {
@@ -652,15 +676,6 @@ class GameInstaller {
 								$queryParts .= 'cp -rf '.$this->repoPath.trim($source).' '.$this->repoPath.trim($dest).' ; '; // Force Copy from SOURCE to DEST
 							}
 							$queryParts .= "echo \"Status: Copy Done\" >> ".$this->repoPath.'.cacheinfo ; ';
-							return $queryParts;
-						break;
-
-						case 'chmodx':
-							$queryParts = "echo \"Status: CHMODing+x Files...\" >> ".$this->repoPath.'.cacheinfo ; ';
-							foreach ($values as $value) {
-								$queryParts .= 'chmod +x '.$this->repoPath.$value['value'].' ; '; // Allow file or folder to be executed by the user
-							}
-							$queryParts .= "echo \"Status: CHMOD+x Done\" >> ".$this->repoPath.'.cacheinfo ; ';
 							return $queryParts;
 						break;
 
@@ -743,6 +758,15 @@ class GameInstaller {
 							$queryParts = "echo \"Status: Decompressing Files...\" >> ".$this->gameServerPath.'.cacheinfo ; ';
 							foreach ($values as $value) {
 								$queryParts .= 'tar -C '.$this->gameServerPath.' -xzf '.$this->gameServerPath.$value['value'].' ; '; // Decompress + extract (gzip)
+							}
+							$queryParts .= "echo \"Status: Decompress Done\" >> ".$this->gameServerPath.'.cacheinfo ; ';
+							return $queryParts;
+						break;
+
+						case 'untarbz2':
+							$queryParts = "echo \"Status: Decompressing Files...\" >> ".$this->gameServerPath.'.cacheinfo ; ';
+							foreach ($values as $value) {
+								$queryParts .= 'tar -C '.$this->gameServerPath.' -xjf '.$this->gameServerPath.$value['value'].' ; '; // Decompress + extract (bzip2)
 							}
 							$queryParts .= "echo \"Status: Decompress Done\" >> ".$this->gameServerPath.'.cacheinfo ; ';
 							return $queryParts;
@@ -905,7 +929,7 @@ class GameInstaller {
 	 *
 	 * @param String $query
 	 * @param String $context
-	 * @return void
+	 * @return bool
 	 * @access private
 	 */
 	private function executeQuery( $query, $context )
@@ -916,6 +940,16 @@ class GameInstaller {
 			switch ( @$context )
 			{
 				case 'makeRepo':
+
+					// Test if SCREEN is installed
+					$output = $this->sshConnection->exec( 'screen -v' );
+					if (strstr($output, 'Screen version 4.') == FALSE)
+					{
+						$this->logError( 'Screen is not installed on the remote box !' );
+						return FALSE;
+					}
+					unset($output);
+
 					if (!empty( $this->repoPath ))
 					{
 						$uid = substr(uniqid(), 6, 8);
@@ -931,8 +965,35 @@ class GameInstaller {
 
 				//------------------------------------------------------+
 
+				case 'deleteRepo':
+					if (!empty( $this->repoPath ))
+					{
+						$this->sshConnection->exec( 'sleep 0.2 ; rm -rf '.$this->repoPath.' &' ); // Start cooking...
+						// Done
+					}
+				break;
+
+				//------------------------------------------------------+
+
 				case 'installGame':
 				case 'updateGame':
+
+					// Test if SCREEN is installed
+					$output = $this->sshConnection->exec( 'screen -v' );
+					if (strstr($output, 'Screen version 4.') == FALSE)
+					{
+						$this->logError( 'Screen is not installed on the remote box !' );
+						return FALSE;
+					}
+
+					// Test if rsync is installed
+					$output = $this->sshConnection->exec( 'rsync --help | head -n 1' );
+					if (strstr($output, 'rsync  version 3.') == FALSE)
+					{
+						$this->logError( 'Rsync is not installed on the remote box !' );
+						return FALSE;
+					}
+
 					if ( !empty( $this->gameServerPath ) && (!empty( $this->repoPath )) )
 					{
 						$uid = substr(uniqid(), 6, 8);
@@ -950,9 +1011,21 @@ class GameInstaller {
 						// Done
 					}
 				break;
+
+				//------------------------------------------------------+
+
+				case 'deleteGame':
+					if ( !empty( $this->gameServerPath ) )
+					{
+						$this->sshConnection->exec( 'sleep 0.2 ; rm -rf '.$this->gameServerPath.' &' ); // Start cooking...
+						// Done
+					}
+				break;
 			}
 
 		}
+
+		return TRUE;
 	}
 
 	/**

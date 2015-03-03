@@ -22,7 +22,7 @@
  * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
  * @copyleft	2013
  * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 8
+ * @version		(Release 0) DEVELOPER BETA 9
  * @link		http://www.bgpanel.net/
  */
 
@@ -36,7 +36,7 @@ if (!defined('LICENSE'))
 
 
 
-$connection = mysql_pconnect(DBHOST, DBUSER, DBPASSWORD);	// Connection to database
+$connection = mysql_connect(DBHOST, DBUSER, DBPASSWORD);	// Connection to database
 if (!$connection)	// Return error if connection is broken
 {
 	exit("<html><head></head><body><b>Critical Error!!!</b><br />MySQL Error!</body></html>");

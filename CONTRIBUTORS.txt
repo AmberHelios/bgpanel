@@ -1,8 +1,8 @@
 ===================================================================
 			Bright Game Panel - PHP Game Control Panel
-			  by warhawk3407 (warhawk3407@gmail.com)
+			 by warhawk3407 (warhawk3407@gmail.com)
 
-			   WARHAWK's CONTRIBUTORS SPECIAL THANKS
+			 WARHAWK's CONTRIBUTORS SPECIAL THANKS
 ===================================================================
 
 My first thanks goes to "sUpEr g2", for is whole participation to this project.

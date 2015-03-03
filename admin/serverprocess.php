@@ -22,7 +22,7 @@
  * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
  * @copyleft	2013
  * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 8
+ * @version		(Release 0) DEVELOPER BETA 9
  * @link		http://www.bgpanel.net/
  */
 
@@ -407,7 +407,7 @@ switch (@$task)
 				$makeGameServer = $gameInstaller->makeGameServer( );
 				if ($makeGameServer == FALSE) {
 					$_SESSION['msg1'] = T_('Unable To Install Game Server!');
-					$_SESSION['msg2'] = T_('Internal Error');
+					$_SESSION['msg2'] = $gameInstaller->error;
 					$_SESSION['msg-type'] = 'error';
 					header( 'Location: serveradd.php?gameid='.urlencode($gameid) );
 					die();
@@ -451,7 +451,7 @@ switch (@$task)
 					`gameid` = '".$gameid."',
 					`name` = '".$name."',
 					`game` = '".mysql_real_escape_string($game['game'])."',
-					`status` = 'Active',
+					`status` = 'Pending',
 					`panelstatus` = 'Stopped',
 					`slots` = '".$slots."',
 					`port` = '".$port."',
@@ -707,12 +707,13 @@ switch (@$task)
 			`disabled` = '0',
 			`comment` = '".$name."',
 			`status` = '1' WHERE `id` = '".$serverid."'" );
-		###
-		//Update LGSL cache
-		###
+
+		/**
+		 * Update LGSL cache
+		 */
 		include_once("../libs/lgsl/lgsl_class.php");
 		lgsl_query_cached("", "", "", "", "", "sep", $serverid);
-		###
+
 		//Adding event to the database
 		$message = "Server Edited: ".$name;
 		query_basic( "INSERT INTO `".DBPREFIX."log` SET `serverid` = '".$serverid."', `message` = '".$message."', `name` = '".mysql_real_escape_string($_SESSION['adminfirstname'])." ".mysql_real_escape_string($_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
@@ -827,6 +828,20 @@ switch (@$task)
 			{
 				$_SESSION['msg1'] = T_('Error!');
 				$_SESSION['msg2'] = T_("Wine is not installed on the server's box.");
+				$_SESSION['msg-type'] = 'error';
+				header( "Location: serversummary.php?id=".urlencode($serverid) );
+				die();
+			}
+		}
+		###
+		//We check for "jre/java" requirement if it is necessary
+		if (strstr($server['startline'], 'java') != FALSE)
+		{
+			$output = $ssh->exec('java -version'."\n");
+			if (strstr($output, 'java version') == FALSE)
+			{
+				$_SESSION['msg1'] = T_('Error!');
+				$_SESSION['msg2'] = T_("Java is not installed on the server's box.");
 				$_SESSION['msg-type'] = 'error';
 				header( "Location: serversummary.php?id=".urlencode($serverid) );
 				die();
@@ -982,7 +997,12 @@ switch (@$task)
 			header( "Location: serversummary.php?id=".urlencode($serverid) );
 			die();
 		}
-		###
+
+		// Crypto
+		$aes = new Crypt_AES();
+		$aes->setKeyLength(256);
+		$aes->setKey(CRYPT_KEY);
+
 		if ( isset($_GET['serverdeletefiles']) )
 		{
 			// Purge Files
@@ -993,10 +1013,6 @@ switch (@$task)
 			###
 			$box = query_fetch_assoc( "SELECT `ip`, `login`, `password`, `sshport` FROM `".DBPREFIX."box` WHERE `boxid` = '".$rows['boxid']."' LIMIT 1" );
 			$game = query_fetch_assoc( "SELECT `game`, `cachedir` FROM `".DBPREFIX."game` WHERE `gameid` = '".$rows['gameid']."' LIMIT 1" );
-			###
-			$aes = new Crypt_AES();
-			$aes->setKeyLength(256);
-			$aes->setKey(CRYPT_KEY);
 			###
 			// Get SSH2 Object OR ERROR String
 			$ssh = newNetSSH2($box['ip'], $box['sshport'], $box['login'], $aes->decrypt($box['password']));
@@ -1015,7 +1031,15 @@ switch (@$task)
 			###
 			$opStatus = $gameInstaller->checkOperation( 'installGame' );
 			if ($opStatus == FALSE) {
-				$gameInstaller->deleteGameServer( );
+				$gameInstallerDeleteGameServer = $gameInstaller->deleteGameServer( );
+
+				if ($gameInstallerDeleteGameServer == FALSE) {
+					$_SESSION['msg1'] = T_('Unable To Delete Game Server!');
+					$_SESSION['msg2'] = $gameInstaller->error;
+					$_SESSION['msg-type'] = 'error';
+					header( "Location: serversummary.php?id=".urlencode($serverid) );
+					die();
+				}
 			}
 			else {
 				$_SESSION['msg1'] = T_('Validation Error!');
@@ -1025,12 +1049,11 @@ switch (@$task)
 				die();
 			}
 		}
-		###
+
 		query_basic( "DELETE FROM `".DBPREFIX."server` WHERE `serverid` = '".$serverid."' LIMIT 1" );
 		query_basic( "DELETE FROM `".DBPREFIX."lgsl` WHERE `id` = '".$serverid."' LIMIT 1" ); //LGSL
-		###
+
 		$message = 'Server Deleted: '.mysql_real_escape_string($rows['name']);
-		###
 		query_basic( "INSERT INTO `".DBPREFIX."log` SET `serverid` = '".$serverid."', `boxid` = '".$rows['boxid']."', `message` = '".$message."', `name` = '".mysql_real_escape_string($_SESSION['adminfirstname'])." ".mysql_real_escape_string($_SESSION['adminlastname'])."', `ip` = '".$_SERVER['REMOTE_ADDR']."'" );
 		###
 		$_SESSION['msg1'] = T_('Server Deleted Successfully!');
@@ -1536,7 +1559,7 @@ switch (@$task)
 		$makeGameServer = $gameInstaller->makeGameServer( );
 		if ($makeGameServer == FALSE) {
 			$_SESSION['msg1'] = T_('Unable To Install Game Server!');
-			$_SESSION['msg2'] = T_('Internal Error');
+			$_SESSION['msg2'] = $gameInstaller->error;
 			$_SESSION['msg-type'] = 'error';
 			header( "Location: serversummary.php?id=".urlencode($serverid) );
 			die();
@@ -1657,7 +1680,7 @@ switch (@$task)
 		$updateGameServer = $gameInstaller->updateGameServer( );
 		if ($updateGameServer == FALSE) {
 			$_SESSION['msg1'] = T_('Unable To Update Game Server!');
-			$_SESSION['msg2'] = T_('Internal Error');
+			$_SESSION['msg2'] = $gameInstaller->error;
 			$_SESSION['msg-type'] = 'error';
 			header( "Location: serversummary.php?id=".urlencode($serverid) );
 			die();

@@ -22,7 +22,7 @@
  * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
  * @copyleft	2013
  * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 8
+ * @version		(Release 0) DEVELOPER BETA 9
  * @link		http://www.bgpanel.net/
  */
 
@@ -110,6 +110,40 @@ function getClientGroups($clientid)
 		}
 	}
 	return FALSE;
+}
+
+
+
+/**
+ * Retrieve all Client's servers in an array
+ *
+ * Return an Array()
+ */
+function getClientServers($clientid)
+{
+	$clientServers = array();
+
+	$groups = getClientGroups($clientid);
+	if ($groups != FALSE) {
+		foreach($groups as $value)
+		{
+			if (getGroupServers($value) != FALSE) {
+				$groupServers[] = getGroupServers($value);
+			}
+		}
+	}
+
+	if (!empty($groupServers)) {
+		foreach($groupServers as $key => $value)
+		{
+			foreach($value as $subkey => $subvalue)
+			{
+				$clientServers[] = $subvalue;
+			}
+		}
+	}
+
+	return $clientServers;
 }
 
 

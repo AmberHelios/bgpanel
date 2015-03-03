@@ -22,26 +22,22 @@
  * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
  * @copyleft	2013
  * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 8
+ * @version		(Release 0) DEVELOPER BETA 9
  * @link		http://www.bgpanel.net/
  */
-
 
 
 
 $page = 'clientlog';
 $tab = 1;
 $isSummary = TRUE;
-###
-if (isset($_GET['id']) && is_numeric($_GET['id']))
-{
-	$clientid = $_GET['id'];
-}
-else
+
+if ( !isset($_GET['id']) || !is_numeric($_GET['id']) )
 {
 	exit('Error: ClientID error.');
 }
-###
+
+$clientid = $_GET['id'];
 $return = 'clientlog.php?id='.urlencode($clientid);
 
 
@@ -50,6 +46,8 @@ require("./include.php");
 
 
 $title = T_('Client Activity Logs');
+
+$clientid = mysql_real_escape_string($_GET['id']);
 
 
 if (query_numrows( "SELECT `username` FROM `".DBPREFIX."client` WHERE `clientid` = '".$clientid."'" ) == 0)
@@ -183,7 +181,7 @@ unset($n);
 if (mysql_num_rows($logs) != 0)
 {
 ?>
-				<script type="text/javascript">
+				<script>
 				$(document).ready(function() {
 					$("#logs").tablesorter({
 						sortList: [[0,1]]

@@ -22,7 +22,7 @@
  * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
  * @copyleft	2013
  * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 8
+ * @version		(Release 0) DEVELOPER BETA 9
  * @link		http://www.bgpanel.net/
  */
 
@@ -31,16 +31,13 @@
 $page = 'serverlgsl';
 $tab = 2;
 $isSummary = TRUE;
-###
-if (isset($_GET['id']) && is_numeric($_GET['id']))
-{
-	$serverid = $_GET['id'];
-}
-else
+
+if ( !isset($_GET['id']) || !is_numeric($_GET['id']) )
 {
 	exit('Error: ServerID error.');
 }
-###
+
+$serverid = $_GET['id'];
 $return = 'serverlgsl.php?id='.urlencode($serverid);
 
 
@@ -50,6 +47,8 @@ require("../libs/lgsl/lgsl_class.php");
 
 
 $title = T_('Live Game Server List');
+
+$serverid = mysql_real_escape_string($_GET['id']);
 
 
 if (query_numrows( "SELECT `name` FROM `".DBPREFIX."server` WHERE `serverid` = '".$serverid."'" ) == 0)
@@ -86,6 +85,7 @@ if ($rows['panelstatus'] == 'Started')
 
 ?>
 
+				<li><a href="#" onclick="ajxp()"><?php echo T_('WebFTP'); ?></a></li>
 				<li><a href="serverlog.php?id=<?php echo $serverid; ?>"><?php echo T_('Activity Logs'); ?></a></li>
 			</ul>
 <?php
@@ -270,6 +270,15 @@ $output .= "
 	unset($output);
 
 }
+
+?>
+			<script>
+			function ajxp()
+			{
+				window.open('utilitieswebftp.php?go=true', 'AjaXplorer - files', config='width='+screen.width/1.5+', height='+screen.height/1.5+', fullscreen=yes, toolbar=no, location=no, directories=no, status=yes, menubar=no, scrollbars=yes, resizable=yes');
+			}
+			</script>
+<?php
 
 
 include("./bootstrap/footer.php");

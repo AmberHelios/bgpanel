@@ -22,7 +22,7 @@
  * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
  * @copyleft	2013
  * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 8
+ * @version		(Release 0) DEVELOPER BETA 9
  * @link		http://www.bgpanel.net/
  */
 
@@ -238,7 +238,7 @@ switch ($step)
 
 		// We retrieve screen contents
 		$ssh->write("screen -R ".$session."\n");
-		$ssh->setTimeout(1);
+		$ssh->setTimeout(1.1);
 
 		@$ansi->appendString($ssh->read());
 		$screenContents = htmlspecialchars_decode(strip_tags($ansi->getScreen()));
@@ -257,15 +257,11 @@ switch ($step)
 
 
 ?>
-			<script type="text/javascript">
-			$(document).ready(function() {
-				prettyPrint();
-			});
-			</script>
-			<div class="page-header">
-				<h1><small><?php echo htmlspecialchars($server['name'], ENT_QUOTES); ?></small></h1>
-			</div>
-<pre class="prettyprint">
+
+			<h1><small><?php echo htmlspecialchars($server['name'], ENT_QUOTES); ?></small></h1>
+
+			<div id="ajaxicon" style="float: right; margin-top: 32px; margin-right: 8px;"></div><br />
+<pre class="prettyprint" id="console">
 <?php
 
 		// Each lines are a value of rowsTable
@@ -307,7 +303,7 @@ switch ($step)
 						</li>
 					</ul>
 				</div>
-				<script type="text/javascript">
+				<script>
 				function dlScrLog()
 				{
 					if (confirm("<?php echo T_('Download SCREENLOG ?'); ?>"))
@@ -315,6 +311,33 @@ switch ($step)
 						window.location.href='serverprocess.php?task=getserverlog&serverid=<?php echo $serverid; ?>';
 					}
 				}
+
+				<!-- AJAX CONSOLE AUTO-LOAD -->
+
+				$(document).ready(function() {
+					prettyPrint();
+
+					function refreshConsole()
+					{
+						jQuery.ajax({
+							url: '<?php echo 'utilitiesrcontoolprocess.php?serverid='.urlencode($serverid); ?>',
+							success: function(data, textStatus, jqXHR) {
+								$( "#console" ).html( data );
+								prettyPrint();
+								$( "#ajaxicon" ).html( '' );
+							},
+							error: function(jqXHR, textStatus, errorThrown) {
+								$( "#console" ).html( 'Loading...' );
+							}
+						});
+					}
+
+					var refreshId = setInterval( function()
+					{
+						$( "#ajaxicon" ).html( "<img src='../bootstrap/img/ajax-loader.gif' alt='loading...' />&nbsp;Loading..." );
+						refreshConsole();
+					}, 5000 );
+				});
 				</script>
 <?php
 		break;

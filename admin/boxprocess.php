@@ -22,7 +22,7 @@
  * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
  * @copyleft	2013
  * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 8
+ * @version		(Release 0) DEVELOPER BETA 9
  * @link		http://www.bgpanel.net/
  */
 
@@ -140,20 +140,32 @@ switch (@$task)
 		unset($_SESSION['login']);
 		unset($_SESSION['sshport']);
 		unset($_SESSION['notes']);
-		###
+
 		//Security
 		$sshport = abs($sshport);
-		###
+
+		//User Path
+		if ($login == 'root') {
+			$path = '/root';
+		}
+		else {
+			$path = '/home/'.$login;
+		}
+
 		//Adding the box to the database
+
+		// Crypto
 		$aes = new Crypt_AES();
 		$aes->setKeyLength(256);
 		$aes->setKey(CRYPT_KEY);
+
 		query_basic( "INSERT INTO `".DBPREFIX."box` SET
 			`name` = '".$name."',
 			`ip` = '".$ip."',
 			`login` = '".$login."',
 			`password` = '".mysql_real_escape_string($aes->encrypt($password))."',
 			`sshport` = '".$sshport."',
+			`path` = '".$path."',
 			`notes` = '".$notes."'" );
 		###
 		$boxid = mysql_insert_id();
@@ -287,10 +299,23 @@ switch (@$task)
 			header( "Location: boxprofile.php?id=".urlencode($boxid) );
 			die();
 		}
-		###
+
 		//Security
 		$sshport = abs($sshport);
-		###
+
+		//User Path
+		if ($login == 'root') {
+			$path = '/root';
+		}
+		else {
+			$path = '/home/'.$login;
+		}
+
+		// Crypto
+		$aes = new Crypt_AES();
+		$aes->setKeyLength(256);
+		$aes->setKey(CRYPT_KEY);
+
 		//Check SSH2 connection if specified
 		if ($verify == 'on')
 		{
@@ -298,9 +323,6 @@ switch (@$task)
 			{
 				// Get SSH Password
 				$passwd = query_fetch_assoc( "SELECT `password` FROM `".DBPREFIX."box` WHERE `boxid` = '".$boxid."' LIMIT 1" );
-				$aes = new Crypt_AES();
-				$aes->setKeyLength(256);
-				$aes->setKey(CRYPT_KEY);
 				$password = $aes->decrypt($passwd['password']);
 				unset($passwd);
 			}
@@ -326,9 +348,6 @@ switch (@$task)
 		}
 		else
 		{
-			$aes = new Crypt_AES();
-			$aes->setKeyLength(256);
-			$aes->setKey(CRYPT_KEY);
 			$password = $aes->encrypt($password);
 		}
 
@@ -345,6 +364,7 @@ switch (@$task)
 		  `login` = '".$login."',
 		  `password` = '".mysql_real_escape_string($password)."',
 		  `sshport` = '".$sshport."',
+		  `path` = '".$path."',
 		  `notes` = '".$notes."' WHERE `boxid` = '".$boxid."'" );
 
 		// Check if the password has been correctly stored
@@ -407,7 +427,7 @@ switch (@$task)
 		break;
 
 	case 'boxdelete':
-		$boxid = $_GET['id'];
+		$boxid = mysql_real_escape_string($_GET['id']);
 		###
 		$error = '';
 		###
@@ -439,10 +459,10 @@ switch (@$task)
 			die();
 		}
 		$rows = query_fetch_assoc( "SELECT `name` FROM `".DBPREFIX."box` WHERE `boxid` = '".$boxid."' LIMIT 1" );
-		###
+
 		query_basic( "DELETE FROM `".DBPREFIX."box` WHERE `boxid` = '".$boxid."' LIMIT 1" );
 		query_basic( "DELETE FROM `".DBPREFIX."boxIp` WHERE `boxid` = '".$boxid."'" );
-		###
+
 		//Adding event to the database
 		$message = 'Box Deleted: '.mysql_real_escape_string($rows['name']);
 		###
@@ -529,14 +549,16 @@ switch (@$task)
 			header( "Location: boxip.php?id=".urlencode($boxid) );
 			die();
 		}
-		###
+
+		// Crypto
+		$aes = new Crypt_AES();
+		$aes->setKeyLength(256);
+		$aes->setKey(CRYPT_KEY);
+
 		if (!empty($newip))
 		{
 			//Check SSH2 connection if specified
 			list($sshport, $login, $password) = mysql_fetch_array(mysql_query( "SELECT `sshport`, `login`, `password` FROM `".DBPREFIX."box` WHERE `boxid` = '".$boxid."' LIMIT 1" ));
-			$aes = new Crypt_AES();
-			$aes->setKeyLength(256);
-			$aes->setKey(CRYPT_KEY);
 			$password = $aes->decrypt($password);
 			if ($verify == 'on')
 			{
@@ -565,7 +587,7 @@ switch (@$task)
 				}
 			}
 		}
-		###
+
 		$_SESSION['msg1'] = T_('Box Updated Successfully!');
 		$_SESSION['msg2'] = T_('Your changes to the box have been saved.');
 		$_SESSION['msg-type'] = 'success';
@@ -647,7 +669,7 @@ switch (@$task)
 		$makeRepo = $gameInstaller->makeRepo( );
 		if ($makeRepo == FALSE) {
 			$_SESSION['msg1'] = T_('Unable To Make Game Cache Repository!');
-			$_SESSION['msg2'] = T_('Internal Error');
+			$_SESSION['msg2'] = $gameInstaller->error;
 			$_SESSION['msg-type'] = 'error';
 			header( "Location: boxgamefile.php?id=".urlencode($boxid) );
 			die();
@@ -775,7 +797,14 @@ switch (@$task)
 			die();
 		}
 		###
-		$gameInstaller->deleteRepo( );
+		$gameInstallerDeleteRepo = $gameInstaller->deleteRepo( );
+		if ($gameInstallerDeleteRepo == FALSE) {
+			$_SESSION['msg1'] = T_('Unable To Delete Game Cache Repository!');
+			$_SESSION['msg2'] = $gameInstaller->error;
+			$_SESSION['msg-type'] = 'error';
+			header( "Location: boxgamefile.php?id=".urlencode($boxid) );
+			die();
+		}
 		###
 		//Adding event to the database
 		$message = "Repository Deleted for ".mysql_real_escape_string( $game['game'] )." on ".mysql_real_escape_string( $box['name'] );

@@ -22,7 +22,7 @@
  * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
  * @copyleft	2013
  * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 8
+ * @version		(Release 0) DEVELOPER BETA 9
  * @link		http://www.bgpanel.net/
  */
 
@@ -71,14 +71,13 @@ include("./bootstrap/notifications.php");
 						<input type="text" name="username" class="span4" value="<?php echo htmlspecialchars($rows['username'], ENT_QUOTES); ?>">
 					<label><?php echo T_('Password'); ?></label>
 						<input type="password" name="password" class="span3" placeholder="">
-						<span class="help-inline"><?php echo T_('Leave blank for no change'); ?></span>
 					<label><?php echo T_('Password'); ?></label>
 						<input type="password" name="password2" class="span3" placeholder="">
 					<label><?php echo T_('Language'); ?></label>
 						<select class="span2" name="language">
 <?php
 //---------------------------------------------------------+
-foreach ($languages as $key => $value)
+foreach ($global_languages as $key => $value)
 {
 	if ($value == htmlspecialchars($rows['lang'], ENT_QUOTES))
 	{

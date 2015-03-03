@@ -22,7 +22,7 @@
  * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
  * @copyleft	2013
  * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 8
+ * @version		(Release 0) DEVELOPER BETA 9
  * @link		http://www.bgpanel.net/
  */
 
@@ -31,23 +31,24 @@
 $page = 'configgroupedit';
 $tab = 5;
 $isSummary = TRUE;
-###
-if (isset($_GET['id']) && is_numeric($_GET['id']))
-{
-	$groupid = $_GET['id'];
-}
-else
+
+if ( !isset($_GET['id']) || !is_numeric($_GET['id']) )
 {
 	exit('Error: GroupID error.');
 }
-###
+
+$groupid = $_GET['id'];
 $return = 'configgroupedit.php?id='.urlencode($groupid);
 
 
 require("../configuration.php");
 require("./include.php");
 
+
 $title = T_('Edit Group');
+
+$groupid = mysql_real_escape_string($_GET['id']);
+
 
 if (query_numrows( "SELECT `name` FROM `".DBPREFIX."group` WHERE `groupid` = '".$groupid."'" ) == 0)
 {

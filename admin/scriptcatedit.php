@@ -22,7 +22,7 @@
  * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
  * @copyleft	2013
  * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 8
+ * @version		(Release 0) DEVELOPER BETA 9
  * @link		http://www.bgpanel.net/
  */
 
@@ -31,16 +31,13 @@
 $page = 'scriptcatedit';
 $tab = 5;
 $isSummary = TRUE;
-###
-if (isset($_GET['id']) && is_numeric($_GET['id']))
-{
-	$catid = $_GET['id'];
-}
-else
+
+if ( !isset($_GET['id']) || !is_numeric($_GET['id']) )
 {
 	exit('Error: CatID error.');
 }
-###
+
+$catid = $_GET['id'];
 $return = 'scriptcatedit.php?id='.urlencode($catid);
 
 
@@ -49,6 +46,8 @@ require("./include.php");
 
 
 $title = T_('Edit Script Category');
+
+$catid = mysql_real_escape_string($_GET['id']);
 
 
 if (query_numrows( "SELECT `name` FROM `".DBPREFIX."scriptCat` WHERE `id` = '".$catid."'" ) == 0)

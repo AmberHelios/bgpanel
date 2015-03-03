@@ -22,7 +22,7 @@
  * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
  * @copyleft	2013
  * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 8
+ * @version		(Release 0) DEVELOPER BETA 9
  * @link		http://www.bgpanel.net/
  */
 
@@ -31,16 +31,13 @@
 $page = 'boxlog';
 $tab = 3;
 $isSummary = TRUE;
-###
-if (isset($_GET['id']) && is_numeric($_GET['id']))
-{
-	$boxid = $_GET['id'];
-}
-else
+
+if ( !isset($_GET['id']) || !is_numeric($_GET['id']) )
 {
 	exit('Error: BoxID error.');
 }
-###
+
+$boxid = $_GET['id'];
 $return = 'boxlog.php?id='.urlencode($boxid);
 
 
@@ -49,6 +46,8 @@ require("./include.php");
 
 
 $title = T_('Box Activity Logs');
+
+$boxid = mysql_real_escape_string($_GET['id']);
 
 
 if (query_numrows( "SELECT `name` FROM `".DBPREFIX."box` WHERE `boxid` = '".$boxid."'" ) == 0)
@@ -109,6 +108,7 @@ include("./bootstrap/notifications.php");
 				<li><a href="boxserver.php?id=<?php echo $boxid; ?>"><?php echo T_('Servers'); ?></a></li>
 				<li><a href="boxchart.php?id=<?php echo $boxid; ?>"><?php echo T_('Charts'); ?></a></li>
 				<li><a href="boxgamefile.php?id=<?php echo $boxid; ?>"><?php echo T_('Game File Repositories'); ?></a></li>
+				<li><a href="#" onclick="ajxp()"><?php echo T_('WebFTP'); ?></a></li>
 				<li class="active"><a href="boxlog.php?id=<?php echo $boxid; ?>"><?php echo T_('Activity Logs'); ?></a></li>
 			</ul>
 			<div class="pagination" style="text-align: center;">
@@ -185,7 +185,7 @@ unset($n);
 if (mysql_num_rows($logs) != 0)
 {
 ?>
-				<script type="text/javascript">
+				<script>
 				$(document).ready(function() {
 					$("#logs").tablesorter({
 						sortList: [[0,1]]
@@ -198,6 +198,12 @@ unset($logs, $numLogs, $numPages, $page);
 
 ?>
 			</div>
+			<script>
+			function ajxp()
+			{
+				window.open('utilitieswebftp.php?go=true', 'AjaXplorer - files', config='width='+screen.width/1.5+', height='+screen.height/1.5+', fullscreen=yes, toolbar=no, location=no, directories=no, status=yes, menubar=no, scrollbars=yes, resizable=yes');
+			}
+			</script>
 <?php
 
 
