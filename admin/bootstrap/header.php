@@ -324,7 +324,7 @@ if ($page != 'login')
 									<li><a href="configcron.php"><i class="icon-info-sign <?php echo formatIcon(); ?>"></i>&nbsp;<?php echo T_('Cron Settings'); ?></a></li>
 									<li><a href="configapikey.php"><i class="icon-info-sign <?php echo formatIcon(); ?>"></i>&nbsp;<?php echo T_('API Key'); ?></a></li>
 									<li class="nav-header">&nbsp;Tickets</li>
-									<li <?php if ($tab == 5){echo "class=\"active\"";}?>><a href="tickets.php"><i class="icon-envelope <?php echo formatIcon(); ?>"></i>&nbsp;Tickets</a></li>
+									<li><a href="tickets.php"><i class="icon-envelope <?php echo formatIcon(); ?>"></i>&nbsp;Tickets</a></li>
 								</ul>
 							</li>
 						</ul>
