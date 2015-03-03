@@ -22,7 +22,7 @@
  * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
  * @copyleft	2013
  * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 9
+ * @version		0.4.8
  * @link		http://www.bgpanel.net/
  */
 
@@ -96,8 +96,8 @@ else
 
 		/*
 		-- BrightGamePanel Database
-		-- Version 0.4.7
-		-- 10/05/2014
+		-- Version 0.4.8
+		-- 03/03/2015
 		*/
 
 		//---------------------------------------------------------+
@@ -455,7 +455,49 @@ else
 		)
 		ENGINE=MyISAM  ; " );
 
+			query_basic( "DROP TABLE IF EXISTS `".DBPREFIX."scriptCat`  ; " );
+			query_basic( "
+		CREATE TABLE `".DBPREFIX."scriptCat` (
+		  `id` int(8) UNSIGNED NOT NULL AUTO_INCREMENT,
+		  `name` text NOT NULL,
+		  `description` text NULL,
+		  PRIMARY KEY  (`id`)
+		)
+		ENGINE=MyISAM  ; " );
 
+		//---------------------------------------------------------+
+
+		//Table structure for table "Tickets"
+
+			query_basic( "DROP TABLE IF EXISTS `".DBPREFIX."ticketmsgs`  ; " );
+			query_basic( "
+		CREATE TABLE `".DBPREFIX."ticketmsgs` (
+			`msgid` int(10) unsigned NOT NULL AUTO_INCREMENT,
+			`ticket` int(10) unsigned NOT NULL,
+			`message` text NOT NULL,
+			`admin` int(10) unsigned DEFAULT NULL,
+			`time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+			PRIMARY KEY (`msgid`),
+			KEY `otic_idx` (`ticket`),
+			KEY `otic_fk_idx` (`msgid`),
+			CONSTRAINT `otic_fk` FOREIGN KEY (`ticket`) REFERENCES `bgp_tickets` (`ticketid`) ON DELETE CASCADE ON UPDATE CASCADE
+			) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=latin1; " );
+			
+			//Table structure for table "Tickets"
+
+			query_basic( "DROP TABLE IF EXISTS `".DBPREFIX."tickets`  ; " );
+			query_basic( "
+		CREATE TABLE `".DBPREFIX."tickets` (
+			`ticketid` int(10) unsigned NOT NULL AUTO_INCREMENT,
+			`subject` varchar(255) NOT NULL,
+			`creator` int(10) unsigned NOT NULL,
+			`ts_created` timestamp NULL DEFAULT NULL,
+			`ts_updated` timestamp NULL DEFAULT NULL,
+			`status` tinyint(1) NOT NULL DEFAULT '1',
+			`server` int(8) unsigned DEFAULT NULL,
+			PRIMARY KEY (`ticketid`),
+			KEY `creator_idx` (`creator`)
+			) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=latin1; " );
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 //--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 

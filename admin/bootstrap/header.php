@@ -22,7 +22,7 @@
  * @author		warhawk3407 <warhawk3407@gmail.com> @NOSPAM
  * @copyleft	2013
  * @license		GNU General Public License version 3.0 (GPLv3)
- * @version		(Release 0) DEVELOPER BETA 9
+ * @version		0.4.8
  * @link		http://www.bgpanel.net/
  */
 
@@ -323,6 +323,8 @@ if ($page != 'login')
 									<li class="nav-header"><?php echo T_('Misc'); ?></li>
 									<li><a href="configcron.php"><i class="icon-info-sign <?php echo formatIcon(); ?>"></i>&nbsp;<?php echo T_('Cron Settings'); ?></a></li>
 									<li><a href="configapikey.php"><i class="icon-info-sign <?php echo formatIcon(); ?>"></i>&nbsp;<?php echo T_('API Key'); ?></a></li>
+									<li class="nav-header">&nbsp;Tickets</li>
+									<li <?php if ($tab == 5){echo "class=\"active\"";}?>><a href="tickets.php"><i class="icon-envelope icon-white"></i>&nbsp;Tickets</a></li>
 								</ul>
 							</li>
 						</ul>
